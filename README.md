@@ -172,8 +172,8 @@ matplotlib>=3.7.0
 ### **Step 1: Clone the Repository**
 
 ```bash
-git clone https://github.com/yasirfareeddev/Plant_disease_classifier.git
-cd plant-disease-prediction-cnn-deep-leanring-project
+git clone https://github.com/AbdullahMushtaq67/LeafScan.git
+cd leafScan
 ```
 
 ### **Step 2: Create Virtual Environment**
