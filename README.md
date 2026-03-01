@@ -38,7 +38,11 @@ A deep learning web app that predicts plant diseases from leaf images and gives 
 
 ## 🎬 Demo
 
-![Demo]("C:\Users\PC\Desktop\Video Project.mp4")  
+
+
+https://github.com/user-attachments/assets/cb791de6-0e1a-4157-a607-22f0cf525cdf
+
+
 
 ---
 
