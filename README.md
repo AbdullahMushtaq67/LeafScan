@@ -324,18 +324,13 @@ Contributions are welcome! Here's how you can help:
 - [ ] Add multi-language support
 - [ ] Create API endpoint for integration
 
----
-
-## 📄 License
-
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
 ---
 
 ## 📧 Contact
 
 **Built by:** Abdullah Muhammad Mushtaq
-**Project Link:** 
+**Project Link:** https://github.com/AbdullahMushtaq67/LeafScan.git
 
 
 ---
