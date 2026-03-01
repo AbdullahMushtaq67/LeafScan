@@ -17,7 +17,6 @@ A deep learning web app that predicts plant diseases from leaf images and gives 
 - [Training Your Own Model](#-training-your-own-model)  
 - [Results](#-results)  
 - [Contributing](#-contributing)  
-- [License](#-license)  
 - [Contact](#-contact)  
 
 ---
