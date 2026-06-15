@@ -1,0 +1,28 @@
+# Virtual environment
+venv/
+env/
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Large files
+*.zip
+*.tar.gz
+
+# IDE
+.vscode/
+.idea/
+
+# Kaggle credentials
+kaggle.json
+**/kaggle.json
+
+# Dataset folder (large dataset)
+
+# Dataset folders
+# === Dataset (large folder) ===
+Dataset/
+**/Dataset/
