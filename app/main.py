@@ -14,7 +14,7 @@ import streamlit as st
 # =====================================================
 st.set_page_config(
     page_title="LeafScan - Disease Detector & Treatment Lab",
-    page_icon="🍃",
+    page_icon=None,
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -24,38 +24,38 @@ st.set_page_config(
 # SIDEBAR & THEME SELECTION
 # =====================================================
 with st.sidebar:
-    st.markdown("## Customization")
+    st.markdown("## Interface Settings")
     theme_choice = st.selectbox(
         "Select UI Theme",
-        ["Crème & Slate (Light)", "Minty Sea Green (Light)", "Ice Blue (Light)", "Dark Slate (Dark)"],
+        ["Creme & Slate (Light)", "Minty Sea Green (Light)", "Ice Blue (Light)", "Dark Slate (Dark)"],
         index=0
     )
     st.divider()
 
     st.markdown("## About LeafScan")
     st.markdown("""
-    LeafScan uses advanced **Deep Learning** (MobileNetV2 CNN) to:
+    LeafScan utilizes advanced **Deep Learning** (MobileNetV2 CNN) to:
 
-    Detect 15 different plant diseases
-    Provide instant treatment recommendations
-    Give confidence scores for predictions
-    Suggest preventive measures
+    - Detect 15 distinct plant diseases
+    - Provide instant treatment recommendations
+    - Generate confidence scores for each prediction
+    - Suggest preventive and maintenance measures
 
-    **Supported Plants:**
-    - Bell Pepper (2 diseases)
-    - Potato (3 diseases)
-    - Tomato (10+ diseases)
+    **Supported Plant Species:**
+    - Bell Pepper (2 disease classes)
+    - Potato (3 disease classes)
+    - Tomato (10+ disease classes)
     """)
 
     st.divider()
 
     st.markdown("## How It Works")
     st.markdown("""
-    1. **Upload** a clear photo of an affected leaf OR **click an example**
-    2. **Analyze** with our AI model
-    3. **Get insights** on disease type & severity
-    4. **Receive treatment** recommendations
-    5. **Download PDF Report** or ask the AI Chatbot
+    1. **Upload** a clear photograph of an affected leaf, or select a provided example
+    2. **Submit** the image for AI-based analysis
+    3. **Review** the diagnosis, disease type, and confidence score
+    4. **Follow** the prescribed treatment recommendations
+    5. **Download** a formal PDF report for your records
     """)
 
     st.divider()
@@ -63,21 +63,21 @@ with st.sidebar:
     st.markdown("## Disclaimer")
     st.warning("""
     This tool provides **AI-based suggestions only**.
-    For severe plant infections, consult a certified
-    agricultural expert or plant pathologist.
+    For severe or persistent plant infections, consult a certified
+    agricultural expert or qualified plant pathologist.
     """)
 
     st.divider()
-    st.markdown("<small>Built using TensorFlow & Streamlit</small>", unsafe_allow_html=True)
+    st.markdown("<small>Powered by TensorFlow and Streamlit</small>", unsafe_allow_html=True)
 
 
 # =====================================================
-# STRICT THEMES, STYLING & ANIMATIONS
+# THEME CONFIGURATION
+# Light themes: text color is solid black (#000000)
+# Dark theme:  text color is solid white (#FFFFFF)
+# No background uses pure black (#000000)
 # =====================================================
-# 1. White/Light themes: ALL text color MUST be solid black (#000000)
-# 2. Dark theme: ALL text color MUST be solid white (#FFFFFF)
-# 3. NO background is ever pure black (#000000)
-if theme_choice == "Crème & Slate (Light)":
+if theme_choice == "Creme & Slate (Light)":
     bg_color = "#FAF7F0"
     text_color = "#000000"
     sidebar_bg = "#F4EFE6"
@@ -87,6 +87,7 @@ if theme_choice == "Crème & Slate (Light)":
     accent_color = "#8D704B"
     border_color = "#DCD5C5"
     input_bg = "#FAF7F0"
+    is_dark = False
 elif theme_choice == "Minty Sea Green (Light)":
     bg_color = "#F0FDF4"
     text_color = "#000000"
@@ -97,6 +98,7 @@ elif theme_choice == "Minty Sea Green (Light)":
     accent_color = "#059669"
     border_color = "#A7F3D0"
     input_bg = "#F0FDF4"
+    is_dark = False
 elif theme_choice == "Ice Blue (Light)":
     bg_color = "#F0F9FF"
     text_color = "#000000"
@@ -107,7 +109,8 @@ elif theme_choice == "Ice Blue (Light)":
     accent_color = "#0369A1"
     border_color = "#93C5FD"
     input_bg = "#F0F9FF"
-else:  # Dark Slate (Dark)
+    is_dark = False
+else:  # Dark Slate
     bg_color = "#1E293B"
     text_color = "#FFFFFF"
     sidebar_bg = "#0F172A"
@@ -117,6 +120,10 @@ else:  # Dark Slate (Dark)
     accent_color = "#34D399"
     border_color = "#475569"
     input_bg = "#334155"
+    is_dark = True
+
+# Button text is always the theme text color (white on dark, black on light)
+btn_text_color = text_color
 
 st.markdown(f"""
 <style>
@@ -141,7 +148,10 @@ st.markdown(f"""
         color: {text_color} !important;
     }}
 
-    h1, h2, h3, h4, h5, h6, p, li, span, label, div, [data-testid="stMarkdownContainer"] p, [data-testid="stSidebar"] *, .stSelectbox div[data-baseweb="select"] * {{
+    h1, h2, h3, h4, h5, h6, p, li, span, label, div,
+    [data-testid="stMarkdownContainer"] p,
+    [data-testid="stSidebar"] *,
+    .stSelectbox div[data-baseweb="select"] * {{
         color: {text_color} !important;
     }}
 
@@ -149,17 +159,29 @@ st.markdown(f"""
         color: {text_color} !important;
     }}
 
+    /* Selectbox selected value — must follow theme text color */
     .stSelectbox div[data-baseweb="select"] {{
         background-color: {input_bg} !important;
-        color: {text_color} !important;
         border: 1.5px solid {border_color} !important;
     }}
+    .stSelectbox div[data-baseweb="select"] span,
+    .stSelectbox div[data-baseweb="select"] div {{
+        color: {text_color} !important;
+        background-color: {input_bg} !important;
+    }}
+    /* Dropdown arrow icon */
+    .stSelectbox svg {{
+        fill: {text_color} !important;
+    }}
 
-    div[data-baseweb="popover"], div[data-baseweb="menu"], [role="option"], [role="listbox"], ul[role="listbox"] {{
+    /* Dropdown popover always uses white background with black text for legibility */
+    div[data-baseweb="popover"], div[data-baseweb="menu"],
+    [role="option"], [role="listbox"], ul[role="listbox"] {{
         background-color: #ffffff !important;
         color: #000000 !important;
     }}
-    div[data-baseweb="popover"] *, div[data-baseweb="menu"] *, [role="option"] *, [role="listbox"] * {{
+    div[data-baseweb="popover"] *, div[data-baseweb="menu"] *,
+    [role="option"] *, [role="listbox"] * {{
         background-color: #ffffff !important;
         color: #000000 !important;
     }}
@@ -214,7 +236,6 @@ st.markdown(f"""
         border: 2px solid {card_border} !important;
         box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     }}
-
     .disease-box * {{
         color: {text_color} !important;
     }}
@@ -226,14 +247,14 @@ st.markdown(f"""
         border: 2px solid {card_border} !important;
         box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     }}
-
     .healthy-box * {{
         color: {text_color} !important;
     }}
 
+    /* Standard buttons — theme-aware text color */
     div.stButton button {{
         background-color: {card_bg} !important;
-        color: {text_color} !important;
+        color: {btn_text_color} !important;
         border: 1.5px solid {border_color} !important;
         padding: 10px 24px !important;
         border-radius: 8px !important;
@@ -241,7 +262,14 @@ st.markdown(f"""
         transition: all 0.3s ease !important;
         box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important;
     }}
-
+    div.stButton button *,
+    div.stButton button p,
+    div.stButton button span,
+    div.stButton button div,
+    div.stButton > button > div > p {{
+        color: {btn_text_color} !important;
+        background-color: transparent !important;
+    }}
     div.stButton button:hover {{
         background-color: {sidebar_bg} !important;
         border-color: {primary_color} !important;
@@ -249,21 +277,53 @@ st.markdown(f"""
         box-shadow: 0 6px 12px rgba(0,0,0,0.15) !important;
     }}
 
-    div.stDownloadButton button, [data-testid="stDownloadButton"] button {{
-        background-color: #ffffff !important;
-        color: #000000 !important;
-        border: 2px solid #000000 !important;
+    /* Download button — theme-aware text color */
+    div.stDownloadButton button,
+    [data-testid="stDownloadButton"] button {{
+        background-color: {card_bg} !important;
+        color: {btn_text_color} !important;
+        border: 2px solid {border_color} !important;
         padding: 10px 24px !important;
         border-radius: 8px !important;
         font-weight: 600 !important;
         transition: all 0.3s ease !important;
         box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important;
     }}
-    div.stDownloadButton button:hover, [data-testid="stDownloadButton"] button:hover {{
-        background-color: #f1f5f9 !important;
-        color: #000000 !important;
-        border-color: #000000 !important;
+    div.stDownloadButton button *,
+    div.stDownloadButton button p,
+    div.stDownloadButton button span,
+    div.stDownloadButton button div,
+    [data-testid="stDownloadButton"] button *,
+    [data-testid="stDownloadButton"] button p,
+    [data-testid="stDownloadButton"] button span,
+    [data-testid="stDownloadButton"] button div {{
+        color: {btn_text_color} !important;
+        background-color: transparent !important;
+    }}
+    div.stDownloadButton button:hover,
+    [data-testid="stDownloadButton"] button:hover {{
+        background-color: {sidebar_bg} !important;
+        border-color: {primary_color} !important;
         box-shadow: 0 6px 12px rgba(0,0,0,0.15) !important;
+    }}
+
+    /* File uploader Browse button */
+    [data-testid="stFileUploader"] button,
+    [data-testid="stFileUploaderDropzone"] button {{
+        background-color: {card_bg} !important;
+        color: {btn_text_color} !important;
+        border: 1.5px solid {border_color} !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+    }}
+    [data-testid="stFileUploader"] button *,
+    [data-testid="stFileUploader"] button p,
+    [data-testid="stFileUploader"] button span,
+    [data-testid="stFileUploaderDropzone"] button *,
+    [data-testid="stFileUploaderDropzone"] button p,
+    [data-testid="stFileUploaderDropzone"] button span {{
+        color: {btn_text_color} !important;
+        background-color: transparent !important;
     }}
 
     .logo-banner {{
@@ -309,14 +369,8 @@ st.markdown(f"""
     }}
 
     @keyframes slideInUp {{
-        from {{
-            opacity: 0;
-            transform: translateY(20px);
-        }}
-        to {{
-            opacity: 1;
-            transform: translateY(0);
-        }}
+        from {{ opacity: 0; transform: translateY(20px); }}
+        to   {{ opacity: 1; transform: translateY(0); }}
     }}
     .logo-banner, .info-card, .healthy-box, .disease-box, [data-testid="column"] {{
         animation: slideInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -341,16 +395,25 @@ st.markdown(f"""
 st.markdown(f"""
 <div class="logo-banner">
     <div class="logo-icon-wrap">
-        <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="{text_color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield"><path d="M20 13c0 5-3.5 7.5-7.66 9.7a1 1 0 0 1-.68 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 .76-.97l8-2a1 1 0 0 1 .48 0l8 2A1 1 0 0 1 20 6v7z"/><path d="M12 17v-8"/><path d="M12 9a4 4 0 0 1 4 4v2c0-2-1.5-3.5-4-3.5"/><path d="M12 11c-2.5 0-4 1.5-4 3.5v-2a4 4 0 0 1 4-4"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 24 24" fill="none"
+             stroke="{text_color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 13c0 5-3.5 7.5-7.66 9.7a1 1 0 0 1-.68 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 .76-.97l8-2a1 1 0 0 1 .48 0l8 2A1 1 0 0 1 20 6v7z"/>
+            <path d="M12 17v-8"/>
+            <path d="M12 9a4 4 0 0 1 4 4v2c0-2-1.5-3.5-4-3.5"/>
+            <path d="M12 11c-2.5 0-4 1.5-4 3.5v-2a4 4 0 0 1 4-4"/>
+        </svg>
     </div>
     <div class="logo-title-wrap">
         <h1 class="logo-title">LeafScan <span style="font-weight: 800;">Pathology</span></h1>
-        <p class="logo-tagline">AI-Powered Plant Disease Detection & Crop Treatment Guide</p>
+        <p class="logo-tagline">AI-Powered Plant Disease Detection &amp; Crop Treatment Guide</p>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("Instantly identify plant diseases from leaf images and get personalized treatment recommendations.", unsafe_allow_html=True)
+st.markdown(
+    "Upload a leaf photograph to receive an instant AI-based disease diagnosis and personalized treatment recommendations.",
+    unsafe_allow_html=True
+)
 
 
 # =====================================================
@@ -358,7 +421,7 @@ st.markdown("Instantly identify plant diseases from leaf images and get personal
 # =====================================================
 @st.cache_resource
 def load_model_and_data():
-    """Load model, class indices, and treatments (cached for performance)"""
+    """Load model, class indices, and treatments (cached for performance)."""
     working_dir = os.path.dirname(os.path.abspath(__file__))
 
     from tensorflow.keras.applications import MobileNetV2
@@ -406,7 +469,7 @@ model, class_indices, treatments = load_model_and_data()
 # HELPER FUNCTIONS
 # =====================================================
 def load_and_preprocess_image(image, target_size=(224, 224)):
-    """Load and preprocess image for prediction"""
+    """Convert, resize, and normalize an image for model inference."""
     if image.mode != 'RGB':
         image = image.convert('RGB')
     img = image.resize(target_size)
@@ -417,7 +480,7 @@ def load_and_preprocess_image(image, target_size=(224, 224)):
 
 
 def predict_image_class(model, image, class_indices):
-    """Predict disease class and return prediction with confidence"""
+    """Run inference and return the predicted class name and confidence score."""
     preprocessed_img = load_and_preprocess_image(image)
     predictions = model.predict(preprocessed_img, verbose=0)
     predicted_class_index = np.argmax(predictions, axis=1)[0]
@@ -427,18 +490,18 @@ def predict_image_class(model, image, class_indices):
 
 
 def get_treatment_info(disease_name, treatments):
-    """Get treatment information for a disease"""
+    """Retrieve treatment information for a given disease name."""
     if disease_name in treatments:
         return treatments[disease_name]
     return {
-        "treatment": "Consult agricultural expert",
+        "treatment": "Consult a qualified agricultural expert.",
         "medicine": "N/A",
-        "suggestion": "No data available for this disease"
+        "suggestion": "No treatment data is available for this classification."
     }
 
 
 def is_healthy(disease_name):
-    """Check if the plant is healthy"""
+    """Return True if the classification indicates a healthy plant."""
     return "healthy" in disease_name.lower()
 
 
@@ -447,52 +510,52 @@ def is_healthy(disease_name):
 # =====================================================
 examples_mapping = {
     "healthy_pepper": {
-        "label": "🫑 Pepper Bell (Healthy)",
+        "label": "Bell Pepper — Healthy",
         "file": "Pepper__bell___healthy1.JPG",
         "category": "Healthy"
     },
     "healthy_potato": {
-        "label": "Potato (Healthy)",
+        "label": "Potato — Healthy",
         "file": "Potato___healthy1.JPG",
         "category": "Healthy"
     },
     "healthy_tomato": {
-        "label": "Tomato (Healthy)",
+        "label": "Tomato — Healthy",
         "file": "Tomato_healthy1.JPG",
         "category": "Healthy"
     },
     "healthy_potato_alt": {
-        "label": "Potato (Healthy Alt)",
+        "label": "Potato — Healthy (Alt.)",
         "file": "Potato___healthy2.JPG",
         "category": "Healthy"
     },
     "disease_pepper_spot": {
-        "label": "Pepper Bacterial Spot",
+        "label": "Bell Pepper — Bacterial Spot",
         "file": "Pepper__bell___Bacterial_spot1.JPG",
         "category": "Diseased"
     },
     "disease_potato_early": {
-        "label": "Potato Early Blight",
+        "label": "Potato — Early Blight",
         "file": "Potato___Early_blight1.JPG",
         "category": "Diseased"
     },
     "disease_potato_late": {
-        "label": "Potato Late Blight",
+        "label": "Potato — Late Blight",
         "file": "Potato___Late_blight1.JPG",
         "category": "Diseased"
     },
     "disease_tomato_spot": {
-        "label": "Tomato Bacterial Spot",
+        "label": "Tomato — Bacterial Spot",
         "file": "Tomato_Bacterial_spot1.JPG",
         "category": "Diseased"
     },
     "disease_tomato_early": {
-        "label": "Tomato Early Blight",
+        "label": "Tomato — Early Blight",
         "file": "Tomato_Early_blight1.JPG",
         "category": "Diseased"
     },
     "disease_tomato_late": {
-        "label": "Tomato Late Blight",
+        "label": "Tomato — Late Blight",
         "file": "Tomato_Late_blight1.JPG",
         "category": "Diseased"
     }
@@ -515,7 +578,6 @@ def generate_pdf(prediction, confidence, treatment_info, is_healthy):
 
     primary_color = (16, 185, 129)
     dark_slate = (15, 23, 42)
-    light_slate = (241, 245, 249)
     accent_green = (5, 150, 105)
     text_dark = (30, 41, 59)
     text_muted = (100, 116, 139)
@@ -575,7 +637,6 @@ def generate_pdf(prediction, confidence, treatment_info, is_healthy):
     pdf.set_x(16)
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(45, 7, "AI Diagnosis:", ln=False)
-    pdf.set_font("Helvetica", "B", 10)
     if is_healthy:
         pdf.set_text_color(21, 128, 61)
         pdf.cell(0, 7, f"Healthy Plant ({disease_display})", ln=True)
@@ -613,7 +674,7 @@ def generate_pdf(prediction, confidence, treatment_info, is_healthy):
             "Position the crop to receive the recommended 6-8 hours of sunlight daily.",
             "Verify soil N-P-K nutrient balances and apply slow-release organic fertilizer.",
             "Perform bi-weekly pruning of dry lower leaves to optimize ventilation.",
-            f"Pathologist Note: {treatment_info.get('suggestion', 'Plant is in healthy state.')}"
+            f"Pathologist Note: {treatment_info.get('suggestion', 'Plant is in a healthy state.')}"
         ]
         for tip in tips:
             pdf.set_x(16)
@@ -623,7 +684,6 @@ def generate_pdf(prediction, confidence, treatment_info, is_healthy):
         pdf.set_fill_color(255, 255, 255)
         pdf.set_draw_color(226, 232, 240)
         pdf.rect(12, pdf.get_y(), 186, 22, 'DF')
-
         pdf.set_xy(15, pdf.get_y() + 1.5)
         pdf.set_font("Helvetica", "B", 10)
         pdf.set_text_color(185, 28, 28)
@@ -634,7 +694,6 @@ def generate_pdf(prediction, confidence, treatment_info, is_healthy):
         pdf.multi_cell(180, 5, treatment_info.get('treatment', 'Consult local agricultural division.'))
 
         pdf.set_xy(12, pdf.get_y() + 5)
-
         pdf.rect(12, pdf.get_y(), 186, 22, 'DF')
         pdf.set_xy(15, pdf.get_y() + 1.5)
         pdf.set_font("Helvetica", "B", 10)
@@ -646,7 +705,6 @@ def generate_pdf(prediction, confidence, treatment_info, is_healthy):
         pdf.multi_cell(180, 5, treatment_info.get('medicine', 'N/A'))
 
         pdf.set_xy(12, pdf.get_y() + 5)
-
         pdf.rect(12, pdf.get_y(), 186, 22, 'DF')
         pdf.set_xy(15, pdf.get_y() + 1.5)
         pdf.set_font("Helvetica", "B", 10)
@@ -663,7 +721,6 @@ def generate_pdf(prediction, confidence, treatment_info, is_healthy):
         pdf.set_fill_color(254, 242, 242)
         pdf.set_draw_color(252, 165, 165)
         pdf.rect(12, pdf.get_y(), 186, 32, 'DF')
-
         pdf.set_xy(15, pdf.get_y() + 2)
         pdf.set_font("Helvetica", "B", 10)
         pdf.set_text_color(153, 27, 27)
@@ -673,12 +730,12 @@ def generate_pdf(prediction, confidence, treatment_info, is_healthy):
 
         measures = [
             "Isolate the infected crop immediately. Spatial proximity will lead to transmission.",
-            "Sterilize all cutting/pruning tools with 70% alcohol solution before and after use.",
+            "Sterilize all cutting and pruning tools with 70% alcohol solution before and after use.",
             "Strictly avoid overhead watering. Leaf wetness accelerates viral and fungal replication."
         ]
         for idx, measure in enumerate(measures):
             pdf.set_x(15)
-            pdf.cell(5, 5, f"{idx+1}.", ln=False)
+            pdf.cell(5, 5, f"{idx + 1}.", ln=False)
             pdf.cell(0, 5, measure, ln=True)
 
     pdf.set_y(280)
@@ -702,46 +759,62 @@ def generate_pdf(prediction, confidence, treatment_info, is_healthy):
 def get_chatbot_response(prompt, treatments):
     prompt_lower = prompt.lower().strip()
 
-    stopwords = {"how", "do", "i", "treat", "the", "on", "is", "what", "of", "to", "cure", "for", "a", "an", "about", "help", "with", "plant", "leaf", "leaves"}
-    words = [w for w in prompt_lower.replace("?", "").replace(".", "").replace(",", "").split() if w not in stopwords]
+    stopwords = {
+        "how", "do", "i", "treat", "the", "on", "is", "what", "of", "to",
+        "cure", "for", "a", "an", "about", "help", "with", "plant", "leaf", "leaves"
+    }
+    words = [
+        w for w in prompt_lower.replace("?", "").replace(".", "").replace(",", "").split()
+        if w not in stopwords
+    ]
 
     if any(greet in prompt_lower for greet in ["hello", "hi", "hey", "hola", "greetings", "pathologist"]):
-        return ("Hello! I am the LeafScan Plant Pathologist chatbot. 🍃\n\n"
-                "I can help answer questions about plant health, soil conditions, watering practices, "
-                "or details of the 15 leaf diseases supported by LeafScan.\n\n"
-                "**Try asking something like:**\n"
-                "- *'What is early blight?'*\n"
-                "- *'Tell me about potato late blight'*\n"
-                "- *'How to fertilize tomatoes?'*\n"
-                "- *'What plants do you support?'*")
+        return (
+            "Welcome to the LeafScan Plant Pathology Assistant.\n\n"
+            "I am able to answer questions regarding plant health, soil conditions, irrigation practices, "
+            "and the 15 leaf disease classes supported by LeafScan.\n\n"
+            "**Example queries:**\n"
+            "- *What is Early Blight?*\n"
+            "- *Describe Potato Late Blight.*\n"
+            "- *How should tomatoes be fertilized?*\n"
+            "- *Which plant species are supported?*"
+        )
 
     if "support" in prompt_lower or "list" in prompt_lower or ("disease" in prompt_lower and len(words) <= 2):
-        return ("LeafScan currently supports disease detection and treatment guides for:\n"
-                "- **Bell Pepper**: Bacterial Spot, Healthy\n"
-                "- **Potato**: Early Blight, Late Blight, Healthy\n"
-                "- **Tomato**: Bacterial Spot, Early Blight, Late Blight, Leaf Mold, Septoria Leaf Spot, "
-                "Spider Mites (Two-spotted), Target Spot, Yellow Leaf Curl Virus, Mosaic Virus, Healthy\n\n"
-                "Ask me about any of these to learn more!")
+        return (
+            "LeafScan currently supports disease detection and treatment guidance for the following:\n\n"
+            "- **Bell Pepper**: Bacterial Spot, Healthy\n"
+            "- **Potato**: Early Blight, Late Blight, Healthy\n"
+            "- **Tomato**: Bacterial Spot, Early Blight, Late Blight, Leaf Mold, Septoria Leaf Spot, "
+            "Two-Spotted Spider Mites, Target Spot, Yellow Leaf Curl Virus, Mosaic Virus, Healthy\n\n"
+            "Please specify a disease name for detailed treatment information."
+        )
 
     if "water" in prompt_lower or "irrigation" in prompt_lower or "watering" in prompt_lower:
-        return ("💧 **Watering Best Practices:**\n\n"
-                "1. **Water at the Base**: Always water the soil directly, not the leaves. Wet foliage promotes fungal growth like blights and leaf molds.\n"
-                "2. **Morning Watering**: Water in the early morning so any moisture on the soil surface can evaporate during the day.\n"
-                "3. **Consistency**: Tomatoes and peppers need consistent moisture to prevent blossom end rot and fruit cracking. Soil should feel damp but not waterlogged.\n"
-                "4. **Drainage**: Ensure your soil/containers have good drainage to prevent root rot.")
+        return (
+            "**Irrigation Best Practices:**\n\n"
+            "1. **Base Watering:** Apply water directly to the soil, not the foliage. Wet leaves promote fungal diseases such as blight and leaf mold.\n"
+            "2. **Morning Application:** Water in the early morning to allow surface moisture to evaporate during daylight hours.\n"
+            "3. **Consistent Moisture:** Tomatoes and peppers require consistent soil moisture to prevent blossom-end rot and fruit cracking. The soil should remain damp but well-drained.\n"
+            "4. **Adequate Drainage:** Ensure containers and beds have sufficient drainage to prevent root rot."
+        )
 
     if "soil" in prompt_lower or "ph" in prompt_lower or "acidity" in prompt_lower:
-        return ("🌱 **Soil & Nutrition Guide:**\n\n"
-                "1. **pH Level**: Tomatoes, peppers, and potatoes prefer slightly acidic to neutral soil (pH 6.0 - 6.8).\n"
-                "2. **Nutrients**: Nitrogen (N) promotes leafy growth; Phosphorus (P) helps root development and flowering; Potassium (K) improves overall disease resistance.\n"
-                "3. **Organic Matter**: Incorporate compost to improve soil texture, drainage, and microbial activity.\n"
-                "4. **Crop Rotation**: Do not plant tomatoes, potatoes, or peppers in the same spot consecutively, as they share similar soil-borne diseases.")
+        return (
+            "**Soil and Nutrition Guidelines:**\n\n"
+            "1. **pH Level:** Tomatoes, peppers, and potatoes prefer slightly acidic to neutral soil (pH 6.0 - 6.8).\n"
+            "2. **Macronutrients:** Nitrogen (N) supports foliar growth; Phosphorus (P) aids root development and flowering; Potassium (K) improves overall disease resistance.\n"
+            "3. **Organic Matter:** Incorporate compost to improve soil texture, drainage, and microbial activity.\n"
+            "4. **Crop Rotation:** Avoid planting tomatoes, potatoes, or peppers in the same location consecutively, as these share common soil-borne diseases."
+        )
 
     if "fertiliz" in prompt_lower or "manure" in prompt_lower or "compost" in prompt_lower or "nutrient" in prompt_lower:
-        return ("🌿 **Fertilization Advice:**\n\n"
-                "1. **Early Stage**: Use balanced N-P-K (e.g., 10-10-10) when planting.\n"
-                "2. **Fruit Set**: Once flowers bloom, shift to low-nitrogen, high-phosphorus/potassium formulas (e.g., 5-10-10) to support fruit growth rather than excessive foliage.\n"
-                "3. **Calcium Deficiency**: Blossom end rot in tomatoes/peppers is caused by calcium deficiency. Add bone meal or agricultural lime if needed.")
+        return (
+            "**Fertilization Guidance:**\n\n"
+            "1. **Establishment Stage:** Apply a balanced N-P-K formula (e.g., 10-10-10) at the time of planting.\n"
+            "2. **Fruit Set Stage:** After flowering begins, transition to a low-nitrogen, high-phosphorus/potassium formula (e.g., 5-10-10) to support fruit development over vegetative growth.\n"
+            "3. **Calcium Deficiency:** Blossom-end rot in tomatoes and peppers is associated with calcium deficiency. Apply bone meal or agricultural lime as needed."
+        )
 
     detected_crops = []
     if "pepper" in prompt_lower or "bell" in prompt_lower:
@@ -773,10 +846,8 @@ def get_chatbot_response(prompt, treatments):
     for key in treatments.keys():
         key_lower = key.lower()
 
-        crop_match = False
-        if not detected_crops:
-            crop_match = True
-        else:
+        crop_match = not detected_crops
+        if not crop_match:
             for crop in detected_crops:
                 if crop == "pepper" and "pepper" in key_lower:
                     crop_match = True
@@ -785,10 +856,8 @@ def get_chatbot_response(prompt, treatments):
                 elif crop == "tomato" and "tomato" in key_lower:
                     crop_match = True
 
-        disease_match = False
-        if not detected_diseases:
-            disease_match = True
-        else:
+        disease_match = not detected_diseases
+        if not disease_match:
             for disease in detected_diseases:
                 norm_key = key_lower.replace("___", " ").replace("_", " ")
                 if disease in norm_key:
@@ -803,19 +872,26 @@ def get_chatbot_response(prompt, treatments):
             treatment_info = treatments[match_key]
             disease_name = match_key.replace("___", " - ").replace("_", " ").title()
 
-            response += f"🌿 **Information for {disease_name}:**\n\n"
+            response += f"**Pathology Information: {disease_name}**\n\n"
             if "healthy" in match_key.lower():
-                response += f"This is the healthy state for the plant crop. \n\n**Maintenance Tips:** {treatment_info['suggestion']}\n\n"
+                response += (
+                    f"This classification represents a healthy plant.\n\n"
+                    f"**Maintenance Recommendation:** {treatment_info['suggestion']}\n\n"
+                )
             else:
-                response += (f"**Treatment Method:** {treatment_info['treatment']}\n\n"
-                             f"**Recommended Medicine:** {treatment_info['medicine']}\n\n"
-                             f"**Additional Suggestions:** {treatment_info['suggestion']}\n\n"
-                             "--- \n")
+                response += (
+                    f"**Treatment Method:** {treatment_info['treatment']}\n\n"
+                    f"**Recommended Medicine:** {treatment_info['medicine']}\n\n"
+                    f"**Additional Notes:** {treatment_info['suggestion']}\n\n"
+                    "---\n"
+                )
         return response
 
-    return ("I couldn't find a direct match for that query in our plant pathology database. \n\n"
-            "Please try specifying the **crop** (Tomato, Potato, or Bell Pepper) and the **disease** "
-            "(e.g. 'early blight', 'late blight', 'bacterial spot', 'mosaic virus') for a precise diagnosis response.")
+    return (
+        "No direct match was found in the plant pathology database for that query.\n\n"
+        "Please specify the **crop** (Tomato, Potato, or Bell Pepper) and the **disease** "
+        "(e.g., Early Blight, Late Blight, Bacterial Spot, Mosaic Virus) for a precise response."
+    )
 
 
 # =====================================================
@@ -826,10 +902,10 @@ st.markdown("---")
 col_upload, col_info = st.columns([2, 1])
 
 with col_upload:
-    st.subheader("Upload Your Leaf Image")
-    st.markdown("*For best results: clear photo, good lighting, focused on affected areas*")
+    st.subheader("Upload Leaf Image")
+    st.markdown("*For optimal results: submit a clear, well-lit photograph focused on the affected leaf area.*")
     uploaded_image = st.file_uploader(
-        "Choose a JPG or PNG image",
+        "Select a JPG or PNG image",
         type=["jpg", "jpeg", "png"],
         label_visibility="collapsed"
     )
@@ -837,11 +913,11 @@ with col_upload:
 with col_info:
     st.markdown("""
     <div class="info-card">
-        <strong>Requirements:</strong><br>
-        • Clear leaf photo<br>
-        • Good lighting<br>
-        • JPG/PNG format<br>
-        • High resolution
+        <strong>Image Requirements:</strong><br>
+        - Clear, focused leaf photograph<br>
+        - Adequate lighting<br>
+        - JPG or PNG format<br>
+        - High resolution preferred
     </div>
     """, unsafe_allow_html=True)
 
@@ -875,15 +951,15 @@ if image_to_analyze is not None:
     col1, col2 = st.columns([1.2, 1.8])
 
     with col1:
-        st.image(image_to_analyze, use_container_width=True, caption=f"📷 Analyzing: {image_source_name}")
-        if st.button("Clear & Upload Custom Image", use_container_width=True):
+        st.image(image_to_analyze, use_container_width=True, caption=f"Submitted Image: {image_source_name}")
+        if st.button("Clear Image and Upload New", use_container_width=True):
             st.session_state.selected_example = None
             st.rerun()
 
     with col2:
         st.subheader("AI Analysis Results")
 
-        with st.spinner("Analyzing your leaf image..."):
+        with st.spinner("Analyzing submitted image. Please wait..."):
             prediction, confidence = predict_image_class(model, image_to_analyze, class_indices)
             treatment_info = get_treatment_info(prediction, treatments)
             healthy = is_healthy(prediction)
@@ -893,34 +969,34 @@ if image_to_analyze is not None:
             if healthy:
                 st.markdown(f"""
                 <div class="healthy-box">
-                    <h3>Great News!</h3>
-                    <p><strong>Status:</strong> {prediction.replace('_', ' ').replace('healthy', 'Healthy')}</p>
-                    <p><strong>Confidence:</strong> {confidence:.1f}%</p>
+                    <h3>Diagnosis: Healthy</h3>
+                    <p><strong>Classification:</strong> {prediction.replace('_', ' ').replace('healthy', 'Healthy')}</p>
+                    <p><strong>Confidence Score:</strong> {confidence:.1f}%</p>
                 </div>
                 """, unsafe_allow_html=True)
 
-                st.markdown("### Plant Health Tips")
+                st.markdown("### Maintenance Recommendations")
                 st.success(f"""
-                **Keep it Healthy!**
+                **The plant appears healthy. Continue the following practices:**
 
-                Water regularly based on season
-                Provide adequate sunlight
-                Maintain optimal temperature
-                Use balanced fertilizer monthly
-                Inspect regularly for early signs
+                - Water regularly according to seasonal requirements
+                - Ensure adequate daily sunlight exposure
+                - Maintain optimal ambient temperature
+                - Apply a balanced fertilizer on a monthly schedule
+                - Conduct routine inspections for early signs of disease
 
-                **Recommendation:** {treatment_info['suggestion']}
+                **Pathologist Note:** {treatment_info['suggestion']}
                 """)
             else:
                 st.markdown(f"""
                 <div class="disease-box">
                     <h3>Disease Detected</h3>
-                    <p><strong>Disease Type:</strong> {prediction.replace('_', ' ').title()}</p>
-                    <p><strong>Confidence:</strong> {confidence:.1f}%</p>
+                    <p><strong>Classification:</strong> {prediction.replace('_', ' ').title()}</p>
+                    <p><strong>Confidence Score:</strong> {confidence:.1f}%</p>
                 </div>
                 """, unsafe_allow_html=True)
 
-                st.markdown("### Treatment Plan")
+                st.markdown("### Prescribed Treatment Plan")
 
                 col_t1, col_t2 = st.columns(2)
 
@@ -940,17 +1016,17 @@ if image_to_analyze is not None:
                     </div>
                     """, unsafe_allow_html=True)
 
-                st.markdown("### Immediate Actions")
+                st.markdown("### Immediate Actions Required")
                 st.error("""
-                1. **Isolate** the infected plant immediately
-                2. **Remove** all affected leaves/parts
-                3. **Disinfect** tools with 70% alcohol
-                4. **Avoid** wetting leaves when watering
-                5. **Increase** air circulation
-                6. **Monitor** nearby plants daily
+                1. **Isolate** the infected plant from surrounding crops immediately
+                2. **Remove** all visibly infected leaves and plant material
+                3. **Disinfect** all cutting and pruning tools with 70% alcohol solution
+                4. **Avoid** overhead watering; apply water at the base only
+                5. **Improve** air circulation around the affected plant
+                6. **Monitor** nearby plants daily for signs of spread
                 """)
 
-                st.markdown("### Additional Suggestion")
+                st.markdown("### Additional Notes")
                 st.info(treatment_info['suggestion'])
 
             st.markdown("---")
@@ -958,33 +1034,33 @@ if image_to_analyze is not None:
             try:
                 pdf_bytes = generate_pdf(prediction, confidence, treatment_info, healthy)
                 st.download_button(
-                    label="📥 Download Diagnosis Report (PDF)",
+                    label="Download Diagnosis Report (PDF)",
                     data=pdf_bytes,
                     file_name=f"LeafScan_Report_{prediction.replace('___', '_')}.pdf",
                     mime="application/pdf",
                     use_container_width=True
                 )
             except Exception as pdf_err:
-                st.error(f"Could not generate PDF report: {pdf_err}")
+                st.error(f"PDF generation failed: {pdf_err}")
 
 else:
     # =====================================================
-    # LANDING / EXAMPLES VIEW
+    # LANDING / EXAMPLE IMAGES VIEW
     # =====================================================
     col_empty1, col_empty2, col_empty3 = st.columns([1, 2, 1])
 
     with col_empty2:
         st.markdown("""
         <div class="info-card" style="text-align: center; padding: 40px;">
-            <h3>Upload a leaf image or click an example below to get started!</h3>
-            <p>Our AI will instantly analyze and provide treatment recommendations.</p>
+            <h3>Upload a leaf image or select an example below to begin analysis.</h3>
+            <p>The AI model will classify the disease and provide a detailed treatment report.</p>
         </div>
         """, unsafe_allow_html=True)
 
     st.markdown("---")
 
-    with st.expander("🔍 Interactive Symptom Diagnostic Assistant (Optional Pre-Diagnostic)"):
-        st.markdown("Check the symptoms you observe on your plant leaf to see the most likely disease matches:")
+    with st.expander("Symptom-Based Pre-Diagnostic Assistant (Optional)"):
+        st.markdown("Select the symptoms observed on the plant leaf. The system will estimate the most probable disease matches.")
 
         col_sym1, col_sym2 = st.columns(2)
         with col_sym1:
@@ -1005,7 +1081,7 @@ else:
         if sym_mold: selected_symptoms.append("mold")
 
         if selected_symptoms:
-            st.markdown("##### Potential Disease Matches:")
+            st.markdown("##### Probable Disease Matches:")
             disease_symptoms = {
                 "Pepper__bell___Bacterial_spot": ["yellow", "brown"],
                 "Potato___Early_blight": ["brown"],
@@ -1033,18 +1109,18 @@ else:
                 for item in matches[:3]:
                     dis_name = item[0].replace("___", " - ").replace("_", " ").title()
                     match_percentage = item[1] * 100
-                    st.write(f"**{dis_name}** ({match_percentage:.0f}% match)")
+                    st.write(f"**{dis_name}** ({match_percentage:.0f}% symptom match)")
                     st.progress(item[1])
             else:
-                st.info("No matching diseases found for the selected symptoms. Try uploading a photo for AI analysis!")
+                st.info("No disease matches found for the selected symptoms. Please upload a leaf photograph for AI-based analysis.")
         else:
-            st.info("Select one or more symptoms above to see live diagnostic estimations.")
+            st.info("Select one or more symptoms above to view estimated disease matches.")
 
     st.markdown("---")
-    st.subheader("Quick Test: Click an Example Leaf Image")
-    st.markdown("Click one of the 4 healthy or 6 diseased leaves below to run disease detection instantly:")
+    st.subheader("Example Leaf Images")
+    st.markdown("Select one of the reference images below to run an immediate AI diagnosis.")
 
-    st.markdown("#### Correct (Healthy) Leaves (4 Examples)")
+    st.markdown("#### Healthy Specimens (4 Examples)")
     cols_healthy = st.columns(4)
     healthy_examples = [item for item in examples_mapping.items() if item[1]["category"] == "Healthy"]
     for idx, (key, info) in enumerate(healthy_examples):
@@ -1057,9 +1133,9 @@ else:
                     st.session_state.selected_example = key
                     st.rerun()
             else:
-                st.warning(f"{info['file']} not found")
+                st.warning(f"Image not found: {info['file']}")
 
-    st.markdown("#### Diseased Leaves (6 Examples)")
+    st.markdown("#### Diseased Specimens (6 Examples)")
     cols_diseased = st.columns(3)
     diseased_examples = [item for item in examples_mapping.items() if item[1]["category"] == "Diseased"]
     for idx, (key, info) in enumerate(diseased_examples):
@@ -1073,25 +1149,39 @@ else:
                     st.session_state.selected_example = key
                     st.rerun()
             else:
-                st.warning(f"{info['file']} not found")
+                st.warning(f"Image not found: {info['file']}")
 
 
 # =====================================================
-# AI CHATBOT SECTION
+# PLANT PATHOLOGY CHATBOT
 # =====================================================
 st.markdown("---")
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = [
-        {"role": "assistant", "content": "🍃 Hello! I'm your LeafScan AI assistant. Ask me anything about plant diseases, treatments, or plant care."}
+        {
+            "role": "assistant",
+            "content": (
+                "Welcome to the LeafScan Plant Pathology Assistant. "
+                "I can provide information on plant diseases, treatments, soil conditions, and general crop management. "
+                "Please enter your query below."
+            )
+        }
     ]
 
 col_chat_title, col_chat_clear = st.columns([4, 1])
 with col_chat_title:
-    st.markdown("### LeafScan Plant Pathology Chatbot")
+    st.markdown("### Plant Pathology Assistant")
 with col_chat_clear:
-    if st.button("Clear Chat", use_container_width=True):
+    if st.button("Reset Conversation", use_container_width=True):
         st.session_state.chat_history = [
-            {"role": "assistant", "content": "🍃 Hello! I'm your LeafScan AI assistant. Ask me anything about plant diseases, treatments, or plant care."}
+            {
+                "role": "assistant",
+                "content": (
+                    "Welcome to the LeafScan Plant Pathology Assistant. "
+                    "I can provide information on plant diseases, treatments, soil conditions, and general crop management. "
+                    "Please enter your query below."
+                )
+            }
         ]
         st.rerun()
 
@@ -1099,14 +1189,14 @@ for message in st.session_state.chat_history:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-if prompt := st.chat_input("Ask a question (e.g., 'What is Early Blight?' or 'How do I care for tomatoes?')"):
+if prompt := st.chat_input("Enter your question (e.g., 'What is Early Blight?' or 'How should tomatoes be irrigated?')"):
     with st.chat_message("user"):
         st.markdown(prompt)
     st.session_state.chat_history.append({"role": "user", "content": prompt})
 
     with st.chat_message("assistant"):
         response_placeholder = st.empty()
-        with st.spinner("Thinking..."):
+        with st.spinner("Processing your query..."):
             response = get_chatbot_response(prompt, treatments)
         response_placeholder.markdown(response)
     st.session_state.chat_history.append({"role": "assistant", "content": response})
@@ -1117,8 +1207,8 @@ if prompt := st.chat_input("Ask a question (e.g., 'What is Early Blight?' or 'Ho
 # =====================================================
 st.markdown(f"""
 <div class="footer-student">
-    <p><b>LeafScan v2.5</b> | AI-Powered Plant Pathology Lab</p>
-    <p>Built with TensorFlow, Keras & Streamlit | Powered by MobileNetV2 CNN</p>
+    <p><b>LeafScan v2.5</b> | AI-Powered Plant Pathology Laboratory</p>
+    <p>Built with TensorFlow, Keras, and Streamlit | Powered by MobileNetV2 Deep Learning</p>
     <p><b>Abdullah Mohammad Mushtaq | IQRA University</b></p>
 </div>
 """, unsafe_allow_html=True)
